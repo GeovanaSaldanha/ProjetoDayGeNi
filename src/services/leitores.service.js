@@ -1,5 +1,6 @@
 // src/services/leitores.service.js
-import * as model from '../models/leitores.model.js';
+import * as leitorModel from '../models/leitores.model.js';
+import * as emprestimoModel from '../models/emprestimo.model.js';
 
 export class ErroDeValidacao extends Error {
   constructor(mensagem) {
@@ -29,4 +30,15 @@ export async function criar({ titulo }) {
   const novaTarefa = { titulo: titulo.trim(), concluida: false };
   const insertedId = await model.inserir(novaTarefa);
   return paraFormatoDaApi({ _id: insertedId, ...novaTarefa });
+}
+
+export async function historico(id) {
+  try {
+    const historico = await emprestimoModel.historico(id);
+
+    return historico;
+
+  } catch (error) {
+    return res.status(404).json({ erro: 'Leitor não encontrado ou historico inexistente.' })
+  }
 }

@@ -47,3 +47,4 @@ export async function remover(id) {
   const resultado = await colecao().deleteOne({ _id: new ObjectId(id) });
   return resultado.deletedCount > 0;
 }
+
