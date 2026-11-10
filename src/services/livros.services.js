@@ -1,36 +1,32 @@
-let livros = [
-  {
-    id: 1,
-    titulo: 'Dom Casmurro',
-    autor: 'Machado de Assis',
-    genero: 'Romance',
-    anoPublicacao: 1899
-  },
-  {
-    id: 2,
-    titulo: 'O Hobbit',
-    autor: 'J.R.R. Tolkien',
-    genero: 'Fantasia',
-    anoPublicacao: 1937
-  },
-  {
-    id: 3,
-    titulo: 'O Namorado',
-    autor: 'Freida McFadden',
-    genero: 'Suspense',
-    anoPublicacao: 2024
-  },
-  {
-    id: 4,
-    titulo: 'A Culpa é das Estrelas',
-    autor: 'John Green',
-    genero: 'Romance',
-    anoPublicacao: 2012
+// src/services/livros.service.js
+import * as model from '../models/livros.model.js';
+
+export class ErroDeValidacao extends Error {
+  constructor(mensagem) {
+    super(mensagem);
+    this.name = 'ErroDeValidacao';
   }
-];
+}
 
-let proximoId = 1;
+// O MongoDB guarda o identificador em `_id` (ObjectId). A API expõe `id` como texto, e é isso que este formato devolve.
+function paraFormatoDaApi(documento) {
+  return {
+    id: documento._id.toHexString(),
+    titulo: documento.titulo,
+    concluida: documento.concluida,
+  };
+}
 
-export function listar(){
-    return livros;
+export async function listar() {
+  const documentos = await model.buscarTodas();
+  return documentos.map(paraFormatoDaApi);
+}
+
+export async function criar({ titulo }) {
+  if (typeof titulo !== 'string' || titulo.trim().length < 3) {
+    throw new ErroDeValidacao('O título deve ter ao menos 3 caracteres.');
+  }
+  const novaTarefa = { titulo: titulo.trim(), concluida: false };
+  const insertedId = await model.inserir(novaTarefa);
+  return paraFormatoDaApi({ _id: insertedId, ...novaTarefa });
 }
