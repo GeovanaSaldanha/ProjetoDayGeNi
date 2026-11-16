@@ -1,6 +1,6 @@
 // src/services/leitores.service.js
 import * as leitorModel from '../models/leitores.model.js';
-import * as emprestimoModel from '../models/emprestimo.model.js';
+import * as emprestimoModel from '../model/emprestimo.model.js';
 
 export class ErroDeValidacao extends Error {
   constructor(mensagem) {
