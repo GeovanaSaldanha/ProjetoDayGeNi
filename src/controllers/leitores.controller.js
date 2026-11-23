@@ -7,3 +7,46 @@ export function listar (req, res){
 export async function historico(id){
     res.json(await service.historico(id));
 }
+ export async function criar(req, res){
+     const NovoLeitor = req.body;
+     try{
+         const resultado = await service.criar(NovoLeitor);
+         res.json(resultado);
+     }catch(erro){
+         throw new Error('Houve um erro ao criar novo leitor.');
+     }
+ }
+ export async function atualizar(req, res){
+    const id = req.params.id;
+    const NovoLeitor = req.body;
+    try{
+        const resultado = await service.atualizar(id, NovoLeitor);
+        res.json(resultado);
+    }catch(erro){
+        throw new Error('Houve um erro ao atualizar o leitor.');
+    }
+}
+
+export async function listarPorId(req, res){
+    const id = req.params.id;
+    try{
+        const resultado = await service.listarPorId(id);
+        res.json(resultado);
+    }catch(erro){
+        throw new Error('leitor não encontrado.');
+    }
+}
+
+export async function deletar (req, res){
+    const id = req.params.id;
+    try{
+        const resultado = await service.deletar(id);
+        res.json(resultado);
+    }catch(erro){
+        throw new Error('Não foi possivel deletar.');
+    }
+}
+ 
+
+
+

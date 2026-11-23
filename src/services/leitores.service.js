@@ -23,13 +23,23 @@ export async function listar() {
   return documentos.map(paraFormatoDaApi);
 }
 
-export async function criar({ titulo }) {
-  if (typeof titulo !== 'string' || titulo.trim().length < 3) {
-    throw new ErroDeValidacao('O título deve ter ao menos 3 caracteres.');
-  }
-  const novaTarefa = { titulo: titulo.trim(), concluida: false };
-  const insertedId = await model.inserir(novaTarefa);
-  return paraFormatoDaApi({ _id: insertedId, ...novaTarefa });
+export async function criar({ nome, email, limiteEmprestimos }) {
+  if (!nome) {
+     throw new ErroDeValidacao('O nome é obrigatório.');
+   }
+ 
+   if (!email) {
+     throw new ErroDeValidacao('O email é obrigatório.');
+   }
+ 
+   const NovoLeitor = {
+     nome: nome.trim(),
+     email: email.trim(),
+     limiteEmprestimos: limiteEmprestimos.trim(),
+    
+   };
+   const insertedId = await model.inserir(NovoLeitor);
+   return { _id: insertedId, ...NovoLeitor};
 }
 
 export async function historico(id) {
@@ -40,5 +50,28 @@ export async function historico(id) {
 
   } catch (error) {
     return res.status(404).json({ erro: 'Leitor não encontrado ou historico inexistente.' })
+  }
+}
+
+export async function atualizar(id, campos) {
+
+  if (nome !== undefined) campos.nome = nome.trim();
+  if (email !== undefined) campos.email = email.trim();
+  if (campos.limiteEmprestimos !== undefined) campos.limiteEmprestimos = limiteEmprestimos.trim();
+
+  const atualizado = await model.atualizar(id, campos);
+
+  if (!atualizado) {
+    throw new ErroNaoEncontrado();
+  }
+
+  return await listarPorId(id);
+}
+
+export async function remover(id) {
+  const removido = await model.remover(id);
+
+  if (!removido) {
+    throw new ErroNaoEncontrado();
   }
 }
