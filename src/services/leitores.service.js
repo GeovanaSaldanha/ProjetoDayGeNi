@@ -1,5 +1,5 @@
 // src/services/leitores.service.js
-import * as leitorModel from '../models/leitores.model.js';
+import * as leitorModel from '../model/leitores.model.js';
 import * as emprestimoModel from '../model/emprestimo.model.js';
 
 export class ErroDeValidacao extends Error {
@@ -9,18 +9,10 @@ export class ErroDeValidacao extends Error {
   }
 }
 
-// O MongoDB guarda o identificador em `_id` (ObjectId). A API expõe `id` como texto, e é isso que este formato devolve.
-function paraFormatoDaApi(documento) {
-  return {
-    id: documento._id.toHexString(),
-    titulo: documento.titulo,
-    concluida: documento.concluida,
-  };
-}
 
 export async function listar() {
-  const documentos = await model.buscarTodas();
-  return documentos.map(paraFormatoDaApi);
+  const documentos = await leitorModel.buscarTodas();
+  return documentos
 }
 
 export async function criar({ nome, email, limiteEmprestimos }) {
@@ -38,7 +30,7 @@ export async function criar({ nome, email, limiteEmprestimos }) {
      limiteEmprestimos: limiteEmprestimos.trim(),
     
    };
-   const insertedId = await model.inserir(NovoLeitor);
+   const insertedId = await leitorModel.inserir(NovoLeitor);
    return { _id: insertedId, ...NovoLeitor};
 }
 
@@ -62,16 +54,19 @@ export async function atualizar(id, campos) {
   const atualizado = await model.atualizar(id, campos);
 
   if (!atualizado) {
-    throw new ErroNaoEncontrado();
+    throw new Error("Não encontrado");
   }
 
   return await listarPorId(id);
 }
 
+
 export async function remover(id) {
-  const removido = await model.remover(id);
+  const removido = await leitorModel.remover(id);
 
   if (!removido) {
-    throw new ErroNaoEncontrado();
+    throw new Error("Não encontrado");
   }
 }
+
+

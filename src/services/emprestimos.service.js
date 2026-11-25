@@ -1,5 +1,5 @@
 // src/services/emprestimo.service.js
-import * as model from '../models/emprestimo.model.js';
+import * as model from '../model/emprestimo.model.js';
 
 export class ErroDeValidacao extends Error {
   constructor(mensagem) {
@@ -8,25 +8,55 @@ export class ErroDeValidacao extends Error {
   }
 }
 
-// O MongoDB guarda o identificador em `_id` (ObjectId). A API expõe `id` como texto, e é isso que este formato devolve.
-function paraFormatoDaApi(documento) {
-  return {
-    id: documento._id.toHexString(),
-    titulo: documento.titulo,
-    concluida: documento.concluida,
-  };
-}
-
 export async function listar() {
   const documentos = await model.buscarTodas();
-  return documentos.map(paraFormatoDaApi);
+  return documentos
 }
 
-export async function criar({ titulo }) {
-  if (typeof titulo !== 'string' || titulo.trim().length < 3) {
-    throw new ErroDeValidacao('O título deve ter ao menos 3 caracteres.');
+export async function criar({ idLivro, idLeitor,dataEmprestimo }) {
+  if (!idLivro) {
+     throw new ErroDeValidacao('O id é obrigatório.');
+   }
+ 
+   if (!idLeitor) {
+     throw new ErroDeValidacao('O LivroId é obrigatório.');
+   }
+  if (!dataEmprestimo) {
+     throw new ErroDeValidacao('O situação é obrigatório.');
+   }
+ 
+   const NovoExemplar = {
+     idLivro: idLivro.trim(),
+     idLeitor: idLeitor.trim(),
+     dataEmprestimo: dataEmprestimo.trim(),
+    
+   };
+   const insertedId = await model.inserir(NovoEmprestimo);
+   return { _id: insertedId, ...NovoEmpretimo};
   }
-  const novaTarefa = { titulo: titulo.trim(), concluida: false };
-  const insertedId = await model.inserir(novaTarefa);
-  return paraFormatoDaApi({ _id: insertedId, ...novaTarefa });
+
+
+  export async function atualizar(id, campos) {
+
+  if (idLivro!== undefined) campos.idLivro= idLivro.trim();
+  if (idLeitor !== undefined) campos.idLeitor= idLeitor.trim();
+  if (campos.dataEmprestimo !== undefined) campos.dataEmprestimo = dataEmprestimo.trim();
+
+  const atualizado = await model.atualizar(id, campos);
+
+  if (!atualizado) {
+    throw new Error("não encontrao");
+  }
+
+  return await listarPorId(id);
+}
+
+export async function remover(id) {
+  const removido = await model.remover(id);
+
+  return removido
+
+  if (!removido) {
+    throw new ErroNaoEncontrado();
+  }
 }

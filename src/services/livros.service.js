@@ -61,7 +61,9 @@ export async function atualizar(id, { titulo, autor, genero, anoPublicacao }) {
   const atualizado = await model.atualizar(id, campos);
 
   if (!atualizado) {
-    throw new ErroNaoEncontrado();
+    throw new Error("Não encontrado");
+    
+    ;
   }
 
   return await listarPorId(id);
